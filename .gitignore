@@ -1,0 +1,8 @@
+# Local backups
+backups/*.json
+
+# OS/editor clutter
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak

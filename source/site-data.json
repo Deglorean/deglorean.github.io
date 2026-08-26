@@ -1,0 +1,159 @@
+{
+  "site": {
+    "brand": "MIGHT HELP",
+    "brandDisplay": "Might Help",
+    "heroTitle": "Might Help.",
+    "tagline": "Made because it might help.",
+    "eyebrow": "Useful things, made with a purpose",
+    "heroLead": "I make programs, tools and resources to solve real problems. If something works, I put it here because it might help someone else too.",
+    "heroNote": "Free to use. No account needed. Donations are optional.",
+    "resourcesHeading": "Things that might help",
+    "resourcesIntro": "A growing collection of practical programs, calculators, simulators, guides and learning resources.",
+    "aboutHeading": "I made something useful. It might help you too.",
+    "aboutParagraphs": [
+      "Most of the things here started because I needed to solve a problem.",
+      "Sometimes that meant building a program. Sometimes it was a calculator, a teaching resource, a simulator or simply a better way of explaining something.",
+      "Once something works, it seems wasteful for it to help only one person.",
+      "So I put it here. Not because every resource will suit everyone, and not because every problem has one perfect answer.",
+      "Just because it might help."
+    ],
+    "principles": [
+      {
+        "title": "Useful",
+        "text": "Everything should solve, explain or simplify something."
+      },
+      {
+        "title": "Practical",
+        "text": "Resources should be made to use, not just made to look impressive."
+      },
+      {
+        "title": "Adaptable",
+        "text": "Where possible, tools should adjust to the person, task or situation."
+      },
+      {
+        "title": "Accessible",
+        "text": "Keep unnecessary barriers between people and useful resources to a minimum."
+      }
+    ],
+    "finalHeading": "Something here might help.",
+    "finalText": "Start with what you need. Use what is useful. Leave the rest.",
+    "copyright": "© 2026 Might Help. Designed and developed by Aaron Lederhose."
+  },
+  "seo": {
+    "siteUrl": "https://mighthelp.com.au",
+    "siteName": "Might Help",
+    "alternateName": "",
+    "homeTitle": "Might Help | Practical Tools, Programs & Resources",
+    "homeDescription": "Practical programs, tools and resources created to solve real problems and made available because they might help someone else too.",
+    "locale": "en_AU",
+    "googleSiteVerification": "",
+    "customDomain": "mighthelp.com.au",
+    "defaultShareImage": "assets/images/might-help-share.png"
+  },
+  "donation": {
+    "enabled": true,
+    "title": "Want to help keep Might Help going?",
+    "text": "Everything on Might Help is intended to remain free to use. If something here has been useful to you and you would like to help with hosting, maintenance and ongoing development, donations are welcome — but never required.",
+    "buttonText": "Donate to Might Help",
+    "url": "",
+    "note": "Donations are completely optional. They do not unlock extra access or change the ownership or licence of any resource."
+  },
+  "links": {
+    "contact": ""
+  },
+  "resources": [
+    {
+      "id": "handwriting-workbench",
+      "slug": "handwriting-workbench",
+      "seoPageEnabled": true,
+      "title": "Handwriting Workbench",
+      "subtitle": "Handwriting resources built around the learner.",
+      "description": "Create customised handwriting worksheets, tracing activities, pencil-control exercises and teaching resources without forcing every learner through the same fixed path.",
+      "cardDescription": "Create handwriting, tracing and pencil-control resources around the learner.",
+      "icon": "Aa",
+      "category": "Learning · Tool",
+      "tags": [
+        "Learning",
+        "Tool",
+        "Handwriting"
+      ],
+      "search": "handwriting worksheet generator tracing pencil control teacher letter formation joined writing cursive handwriting worksheets",
+      "status": "available",
+      "statusText": "View",
+      "visible": true,
+      "featured": true,
+      "appUrl": "tools/handwriting-workbench/",
+      "seoTitle": "Handwriting Workbench | Handwriting Worksheet Generator | Might Help",
+      "metaDescription": "Create customised handwriting worksheets, tracing activities and pencil-control exercises with Handwriting Workbench.",
+      "pageHeading": "Handwriting Workbench",
+      "pageIntro": "Create handwriting resources around what the learner is ready to practise.",
+      "pageContent": [
+        "Handwriting Workbench is designed to help teachers, parents and learners create handwriting material that can be adjusted rather than forcing every learner through the same fixed sequence.",
+        "Create printable handwriting worksheets, tracing activities and pencil-control exercises, then adjust the content and challenge to suit the learner.",
+        "The aim is simple: make it easier to practise the right skill at the right level."
+      ],
+      "featuredBullets": [
+        "Customise the challenge to suit the learner",
+        "Create printable handwriting and tracing resources",
+        "Support pencil control, letter formation and progression"
+      ],
+      "updated": "2026-08-26"
+    },
+    {
+      "id": "risk-calculator",
+      "slug": "risk-calculator",
+      "seoPageEnabled": false,
+      "title": "Risk Calculator",
+      "subtitle": "Compare risk before and after controls.",
+      "description": "A visual risk-assessment tool for comparing risk before and after controls.",
+      "cardDescription": "Compare risk before and after controls using a clear visual method.",
+      "icon": "%",
+      "category": "Calculator",
+      "tags": [
+        "Calculator",
+        "Safety"
+      ],
+      "search": "risk safety workplace WHS controls calculator",
+      "status": "coming",
+      "statusText": "Coming soon",
+      "visible": true,
+      "featured": false,
+      "appUrl": "",
+      "seoTitle": "Risk Calculator | Might Help",
+      "metaDescription": "A visual risk calculator for comparing risk before and after controls.",
+      "pageHeading": "Risk Calculator",
+      "pageIntro": "A practical visual tool for comparing risk before and after controls.",
+      "pageContent": [],
+      "featuredBullets": [],
+      "updated": "2026-08-26"
+    },
+    {
+      "id": "resin-infusion-simulator",
+      "slug": "resin-infusion-simulator",
+      "seoPageEnabled": false,
+      "title": "Resin Infusion Simulator",
+      "subtitle": "Visualise composite resin flow.",
+      "description": "Visualise resin movement and flow behaviour through a composite laminate.",
+      "cardDescription": "Visualise resin movement and flow behaviour through a composite laminate.",
+      "icon": "≈",
+      "category": "Simulator",
+      "tags": [
+        "Simulator",
+        "Engineering"
+      ],
+      "search": "resin infusion composites flow manufacturing simulator",
+      "status": "coming",
+      "statusText": "Coming soon",
+      "visible": true,
+      "featured": false,
+      "appUrl": "",
+      "seoTitle": "Resin Infusion Simulator | Might Help",
+      "metaDescription": "Visualise resin flow behaviour through a composite laminate.",
+      "pageHeading": "Resin Infusion Simulator",
+      "pageIntro": "Visualise composite resin movement and flow.",
+      "pageContent": [],
+      "featuredBullets": [],
+      "updated": "2026-08-26"
+    }
+  ]
+}
