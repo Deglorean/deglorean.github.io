@@ -1,50 +1,23 @@
-# Might Help
+# Might Help — Public Website
 
-**Made because it might help.**
+This folder is the PUBLIC GitHub repository content for:
 
-GitHub Pages-ready static website for:
+https://mighthelp.com.au
 
-**https://mighthelp.com.au**
+## GitHub Pages
 
-## GitHub Pages settings
+Configure:
 
-- Source: **Deploy from a branch**
-- Branch: **main**
-- Folder: **/docs**
-- Custom domain: **mighthelp.com.au**
+- Source: Deploy from a branch
+- Branch: main
+- Folder: /docs
+- Custom domain: mighthelp.com.au
 
-`docs/` is the complete public site.
+Only the contents of `docs/` are published by GitHub Pages.
 
-`docs/.nojekyll` disables Jekyll processing because the website is already
-built as static HTML/CSS/JavaScript.
+## Important
 
-`docs/CNAME` contains the intended domain, but the custom domain must also be
-set under **Repository → Settings → Pages**.
+This public repository intentionally contains only the finished website files.
 
-## Local files
-
-- `editor/` — offline editor
-- `source/site-data.json` — site content/configuration
-- `source/build_site.py` — local builder
-- `backups/` — optional local backups
-
-## Search files
-
-The public site includes:
-
-- canonical URLs
-- structured data
-- Open Graph metadata
-- `robots.txt`
-- `sitemap.xml`
-- custom `404.html`
-
-After launch, verify the domain in GitHub and Google Search Console and submit:
-
-`https://mighthelp.com.au/sitemap.xml`
-
-## Line endings
-
-The repository includes `.gitattributes` to keep website and source text files
-stored as LF on every platform. This prevents Windows Git settings from causing
-line-ending-only changes while leaving binary files untouched.
+The offline editor, build scripts and backups are kept separately in the
+Local-Editor package and should not be uploaded to this public repository.
