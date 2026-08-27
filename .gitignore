@@ -1,6 +1,20 @@
 # Local backups
 backups/*.json
 
+# Private editor/source folders must never enter the public repository.
+Local-Editor/
+editor/
+source/
+apps/
+built-site/
+backups/
+__pycache__/
+*.py
+*.pyc
+*.zip
+.env
+publish-settings.json
+
 # OS/editor clutter
 .DS_Store
 Thumbs.db

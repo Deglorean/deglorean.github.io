@@ -1,0 +1,18 @@
+{
+  "name": "Might Help",
+  "short_name": "Might Help",
+  "description": "Practical tools, programs and resources made because they might help.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f8fb",
+  "theme_color": "#f6f8fb",
+  "icons": [
+    {
+      "src": "assets/images/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,1760 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Risk Score Calculator | Might Help</title>
+<meta name="description" content="Compare Fine-Kinney style risk scores before and after controls, including an adjustable cost-justification analysis.">
+<link rel="icon" href="../../assets/images/favicon.svg" type="image/svg+xml">
+<script>if(new URLSearchParams(location.search).get('preview')==='1')document.documentElement.dataset.preview='true';</script>
+<style>
+  :root{
+    --bg:#f2f3f5;
+    --panel:#ffffff;
+    --ink:#1f2933;
+    --muted:#627386;
+    --line:#111827;
+    --accent:#1f6feb;
+    --border:#c7ced6;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:linear-gradient(180deg,#eef1f5 0%,#f7f8fa 100%);
+    color:var(--ink);
+    font-family:Arial, Helvetica, sans-serif;
+  }
+  .app{
+    max-width:1740px;
+    margin:18px auto;
+    padding:0 16px 24px;
+    overflow-x:hidden;
+  }
+  header{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:12px;
+  }
+  .risk-title-lockup{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    min-width:0;
+  }
+  .might-help-home-link{
+    flex:0 0 64px;
+    width:64px;
+    height:60px;
+    display:grid;
+    place-items:center;
+    padding:5px;
+    background:#fff;
+    border:1px solid rgba(255,255,255,.92);
+    border-radius:16px;
+    box-shadow:0 5px 14px rgba(15,23,42,.18);
+    transition:transform .16s ease,box-shadow .16s ease;
+  }
+  .might-help-home-link:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(15,23,42,.24)}
+  .might-help-home-link:focus-visible{outline:3px solid #3157d5;outline-offset:3px}
+  .might-help-home-link .might-help-code-mark{display:block;width:52px;height:auto}
+  h1{
+    margin:0;
+    font-size:24px;
+    font-weight:700;
+  }
+  .subtitle{
+    margin-top:5px;
+    color:var(--muted);
+    font-size:13px;
+  }
+  .toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:flex-end;
+  }
+  button{
+    border:1px solid #aab4c0;
+    background:#fff;
+    color:var(--ink);
+    padding:8px 12px;
+    border-radius:7px;
+    cursor:pointer;
+    font-size:13px;
+    box-shadow:0 1px 2px rgba(0,0,0,.08);
+  }
+  button:hover{background:#f4f7fb}
+  .workspace{
+    display:grid;
+    grid-template-columns:minmax(0,1120px) 500px;
+    gap:14px;
+    align-items:start;
+    justify-content:center;
+    min-width:0;
+  }
+  .canvas-card,.controls-card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    box-shadow:0 8px 24px rgba(17,24,39,.08);
+  }
+  .canvas-card{
+    overflow:visible;
+    padding:10px;
+    min-width:0;
+  }
+  canvas{
+    display:block;
+    width:100%;
+    max-width:100%;
+    height:auto;
+    aspect-ratio:1660 / 720;
+    background:#f3f3f3;
+    border:1px solid #b9c0c9;
+    border-radius:6px;
+  }
+  .controls-card{
+    padding:14px;
+    position:sticky;
+    top:12px;
+  }
+  .mode-options{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 14px;
+    margin:0 0 12px;
+    padding:10px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:#fbfcfd;
+    font-size:13px;
+    font-weight:700;
+  }
+  .mode-options label{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    cursor:pointer;
+  }
+  .mode-options input{margin:0}
+  .workspace.no-cost{
+    grid-template-columns:minmax(0,980px) 500px;
+  }
+  .control-groups.single{
+    grid-template-columns:1fr;
+  }
+  .hidden{
+    display:none!important;
+  }
+  .control-groups{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    align-items:start;
+  }
+  .cost-control{
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px;
+    margin-top:12px;
+    background:#fbfcfd;
+  }
+  .cost-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    align-items:end;
+  }
+  .cost-control label{
+    font-weight:700;
+    font-size:13px;
+    display:block;
+    margin-bottom:6px;
+  }
+  .cost-control input[type="number"]{
+    width:100%;
+    padding:8px 9px;
+    border:1px solid #aab4c0;
+    border-radius:7px;
+    font-size:13px;
+  }
+  .cost-control input[type="range"]{
+    width:100%;
+    margin-top:8px;
+    accent-color:#2563eb;
+  }
+  .cost-input-wrap{
+    display:flex;
+    align-items:center;
+    border:1px solid #aab4c0;
+    border-radius:7px;
+    background:#fff;
+    overflow:hidden;
+  }
+  .cost-prefix{
+    padding:8px 10px;
+    font-size:13px;
+    color:#273444;
+    background:#eef2f6;
+    border-right:1px solid #cbd5df;
+    font-weight:700;
+  }
+  .cost-input-wrap input[type="number"]{
+    border:0;
+    border-radius:0;
+    padding-left:8px;
+  }
+  .cost-slider-scale{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    font-size:10px;
+    color:#52616f;
+    margin-top:2px;
+  }
+  .cost-factor-control{
+    margin-top:12px;
+    padding-top:10px;
+    border-top:1px solid #d8dee6;
+  }
+  .cost-upper-limit{
+    margin-top:10px;
+  }
+  .method-note{
+    margin-top:12px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px 14px;
+    background:#fff;
+    color:#273444;
+    font-size:12px;
+    line-height:1.42;
+  }
+  .method-note > strong{
+    display:block;
+    font-size:13px;
+    color:#111827;
+    margin-bottom:6px;
+  }
+  .method-note p{
+    margin:0 0 7px;
+  }
+  .method-note p:last-child{
+    margin-bottom:0;
+  }
+  .method-note p strong{
+    color:#111827;
+  }
+  .small-result{
+    font-size:12px;
+    line-height:1.3;
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:10px 12px;
+    background:#ffffff;
+    align-self:start;
+    min-height:72px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .small-result strong{
+    display:block;
+    font-size:20px;
+    line-height:1.05;
+    margin-top:4px;
+  }
+  .controls-card h2{
+    font-size:16px;
+    margin:0 0 12px;
+  }
+  .control{
+    margin-bottom:18px;
+  }
+  .control-group{
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:14px;
+    background:#fbfcfd;
+  }
+  .note-field{
+    margin-bottom:14px;
+  }
+  .note-field label{
+    font-weight:700;
+    font-size:13px;
+    display:block;
+    margin-bottom:6px;
+  }
+  .note-textarea{
+    width:100%;
+    min-height:58px;
+    resize:vertical;
+    border:1px solid #aab4c0;
+    border-radius:7px;
+    padding:8px 9px;
+    font:13px Arial, Helvetica, sans-serif;
+    color:var(--ink);
+    background:#fff;
+  }
+  .note-textarea::placeholder{color:#8794a3}
+  .control-group h3{
+    margin:0 0 10px;
+    font-size:14px;
+  }
+  .control label{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    font-weight:700;
+    font-size:13px;
+    margin-bottom:6px;
+  }
+  .control .desc{
+    color:var(--muted);
+    font-size:12px;
+    min-height:30px;
+    margin-bottom:6px;
+  }
+  input[type="range"]{
+    width:100%;
+    accent-color:var(--accent);
+  }
+  .result{
+    border-top:1px solid var(--border);
+    padding-top:12px;
+    margin-top:8px;
+  }
+  .subresult{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed #d2d8df;
+  }
+  .result .score{
+    font-size:28px;
+    font-weight:800;
+    line-height:1.1;
+  }
+  .badge{
+    display:inline-block;
+    margin-top:8px;
+    padding:6px 8px;
+    border-radius:999px;
+    color:#111;
+    font-weight:700;
+    font-size:12px;
+    border:1px solid rgba(0,0,0,.18);
+  }
+  .formula{
+    color:var(--muted);
+    font-size:12px;
+    margin-top:9px;
+    line-height:1.35;
+  }
+  .note{
+    margin-top:12px;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.35;
+  }
+  @media(max-width:960px){
+    .workspace{grid-template-columns:1fr; justify-content:stretch}
+    .controls-card{position:static}
+    .control-groups{grid-template-columns:1fr}
+    header{align-items:flex-start;flex-direction:column}
+    .toolbar{justify-content:flex-start}
+  }
+  @media(max-width:520px){
+    .app{margin-top:10px;padding-inline:10px}
+    .risk-title-lockup{align-items:flex-start}
+    .might-help-home-link{flex-basis:50px;width:50px;height:48px;padding:4px;border-radius:13px}
+    .might-help-home-link .might-help-code-mark{width:42px}
+    h1{font-size:20px;line-height:1.08}
+  }
+  html[data-preview="true"],html[data-preview="true"] body{min-height:100%;background:#fff;overflow:hidden}
+  html[data-preview="true"] body{display:grid;place-items:center}
+  html[data-preview="true"] .app{width:100%;max-width:none;margin:0;padding:0}
+  html[data-preview="true"] header,
+  html[data-preview="true"] .controls-card,
+  html[data-preview="true"] .method-note,
+  html[data-preview="true"] .note{display:none!important}
+  html[data-preview="true"] .workspace{display:block}
+  html[data-preview="true"] .canvas-card{overflow:hidden;padding:0;border:0;border-radius:0;box-shadow:none}
+  html[data-preview="true"] canvas{border:0;border-radius:0}
+  @media print{
+    body{background:#fff}
+    header,.controls-card,.note,.method-note{display:none!important}
+    .app{margin:0;padding:0}
+    .workspace{display:block}
+    .canvas-card{border:0;box-shadow:none;padding:0}
+    canvas{border:0;border-radius:0}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="risk-title-lockup">
+      <a class="might-help-home-link" href="../../" aria-label="Might Help home" title="Return to the Might Help home page">
+        <svg class="might-help-code-mark" viewBox="0 -20 430 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="risk-left-page" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#0ea6a8"/><stop offset="100%" stop-color="#3882f6"/></linearGradient>
+            <linearGradient id="risk-right-page" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#7b61ff"/><stop offset="100%" stop-color="#3882f6"/></linearGradient>
+          </defs>
+          <g transform="translate(-16 0)">
+            <path fill="#0f172a" d="M55 175V101C55 69 75 49 104 49C126 49 143 59 153 76C163 59 180 49 203 49C234 49 254 70 254 101V175H220V102C220 84 211 74 196 74C180 74 171 85 171 102V175H136V102C136 84 127 74 112 74C97 74 89 85 89 102V175Z"/>
+            <path fill="#0f172a" d="M271 175V0L305 -12V74C316 57 333 49 355 49C387 49 407 70 407 101V175H373V102C373 84 364 74 348 74C322 74 305 90 305 114V175Z"/>
+          </g>
+          <path d="M36 204C108 202 160 212 211 236" fill="none" stroke="url(#risk-left-page)" stroke-width="10" stroke-linecap="round"/>
+          <path d="M211 236C262 212 314 202 394 204" fill="none" stroke="url(#risk-right-page)" stroke-width="10" stroke-linecap="round"/>
+          <path d="M36 228C109 226 161 234 211 258" fill="none" stroke="url(#risk-left-page)" stroke-width="8" stroke-linecap="round"/>
+          <path d="M211 258C261 234 313 226 394 228" fill="none" stroke="url(#risk-right-page)" stroke-width="8" stroke-linecap="round"/>
+        </svg>
+      </a>
+      <div><h1>Risk Score Calculator</h1><div class="subtitle">Visual risk comparison and control-cost analysis</div></div>
+    </div>
+    <div class="toolbar">
+      <button id="printBtn">Quick Print</button>
+      <button id="saveBtn">Save to PNG</button>
+      <button id="copyBtn">Copy Image</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <div class="canvas-card">
+      <canvas id="nomogram" width="1660" height="720" aria-label="Risk score calculator nomogram"></canvas>
+      <div class="method-note">
+        <strong>About this calculator</strong>
+        <p>This calculator uses a Fine-Kinney style risk scoring equation: <strong>risk score = probability × exposure × consequence</strong>. It was designed as a teaching tool and visual representation of the risk-analysis process, helping users see how probability, exposure, and consequence combine to create a risk score and how controls can change the result.</p>
+        <p>The cost analysis is a subjective and adaptive decision-support layer. The cost bar upper limit, cost value scale, and expected risk reduction should be adjusted by the user to suit the workplace, budget, production value, and control priorities. It should not be treated as a fixed legal, financial, or engineering standard.</p>
+        <p><strong>Licence and use:</strong> Copyright © 2026 Aaron Lederhose. Designed and programmed by Aaron Lederhose. Free to use through this website subject to the Terms of Use. The software, interface, layout, code, and explanatory content remain the copyright of Aaron Lederhose. Do not copy, redistribute, sell, re-host, or incorporate this calculator into another product without written permission.</p>
+      </div>
+    </div>
+
+    <aside class="controls-card">
+      <h2>Risk Parameters</h2>
+
+      <div class="mode-options">
+        <label><input id="showAfterControls" type="checkbox" checked> Show After Controls</label>
+        <label><input id="showCostAnalysis" type="checkbox" checked> Show Cost Analysis</label>
+      </div>
+
+      <div class="control-groups" id="controlGroups">
+        <div class="control-group">
+          <h3>Before Controls</h3>
+          <div class="note-field">
+            <label for="hazardBefore">Hazard before controls</label>
+            <textarea id="hazardBefore" class="note-textarea" rows="2" placeholder="Describe the hazard before controls are applied"></textarea>
+          </div>
+          <div class="control">
+            <label for="probability">Probability <span id="pVal">10.0</span></label>
+            <div class="desc" id="pDesc">Almost Certain</div>
+            <input id="probability" type="range" min="0" max="50" step="1" value="50">
+          </div>
+
+          <div class="control">
+            <label for="exposure">Exposure <span id="eVal">1.7</span></label>
+            <div class="desc" id="eDesc">Infrequent</div>
+            <input id="exposure" type="range" min="0" max="50" step="1" value="20">
+          </div>
+
+          <div class="control">
+            <label for="consequence">Consequence <span id="cVal">2.5</span></label>
+            <div class="desc" id="cDesc">Substantial / Medical Treatment</div>
+            <input id="consequence" type="range" min="0" max="50" step="1" value="10">
+          </div>
+
+          <div class="result">
+            <div>Risk</div>
+            <div class="score" id="riskVal">42.5</div>
+            <div class="badge" id="riskBadge">Moderate Risk</div>
+            <div class="formula" id="formulaText">10.0 × 1.7 × 2.5 = 42.5</div>
+          </div>
+        </div>
+
+        <div class="control-group" id="afterControlGroup">
+          <h3>After Controls</h3>
+          <div class="note-field">
+            <label for="controlMeasure">Control measure</label>
+            <textarea id="controlMeasure" class="note-textarea" rows="2" placeholder="Identify the control measure/s applied"></textarea>
+          </div>
+          <div class="control">
+            <label for="probabilityAfter">Probability <span id="pValAfter">2.1</span></label>
+            <div class="desc" id="pDescAfter">Unusual but Possible</div>
+            <input id="probabilityAfter" type="range" min="0" max="50" step="1" value="30">
+          </div>
+
+          <div class="control">
+            <label for="exposureAfter">Exposure <span id="eValAfter">0.9</span></label>
+            <div class="desc" id="eDescAfter">Rare</div>
+            <input id="exposureAfter" type="range" min="0" max="50" step="1" value="10">
+          </div>
+
+          <div class="control">
+            <label for="consequenceAfter">Consequence <span id="cValAfter">2.5</span></label>
+            <div class="desc" id="cDescAfter">Substantial / Medical Treatment</div>
+            <input id="consequenceAfter" type="range" min="0" max="50" step="1" value="10">
+          </div>
+
+          <div class="result">
+            <div>Risk</div>
+            <div class="score" id="riskValAfter">4.7</div>
+            <div class="badge" id="riskBadgeAfter">Low Risk</div>
+            <div class="formula" id="formulaTextAfter">2.1 × 0.9 × 2.5 = 4.7</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cost-control" id="costControlBox">
+        <h3>Cost Analysis</h3>
+        <div class="cost-row">
+          <div>
+            <label for="correctionCost">Cost for Correction</label>
+            <div class="cost-input-wrap">
+              <span class="cost-prefix">$</span>
+              <input id="correctionCost" type="number" min="0" max="1000000" step="1" value="900">
+            </div>
+            <input id="correctionCostSlider" type="range" min="0" max="100" step="0.1" value="49.2" aria-label="Cost line percentage slider">
+            <div class="cost-slider-scale"><span>$0</span><span id="costSliderMaxLabel">$1,000,000</span></div>
+            <div class="cost-upper-limit">
+              <label for="costUpperLimit">Cost bar upper limit</label>
+              <div class="cost-input-wrap">
+                <span class="cost-prefix">$</span>
+                <input id="costUpperLimit" type="number" min="0" max="100000000" step="1" value="1000000">
+              </div>
+            </div>
+          </div>
+          <div class="small-result">
+            Risk Reduction
+            <strong id="reductionVal">88.9%</strong>
+          </div>
+        </div>
+        <div class="cost-factor-control">
+          <label for="costValueFactor">Cost Value Scale <span id="costValueFactorVal">1.00×</span></label>
+          <input id="costValueFactor" type="range" min="0" max="2" step="0.05" value="1" aria-label="Cost value scale factor">
+          <div class="cost-slider-scale"><span>0× = Lower Justification</span><span>1× = Standard Value</span><span>2× = Higher Justification</span></div>
+        </div>
+        <div class="result subresult">
+          <div>Justification Score</div>
+          <div class="score" id="justifyVal">0.0</div>
+          <div class="badge" id="justifyBadge">Calculated</div>
+          <div class="formula" id="justifyFormula">Risk reduction and correction cost</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  const canvas = document.getElementById('nomogram');
+  const ctx = canvas.getContext('2d');
+
+  const inputs = {
+    before: {
+      p: document.getElementById('probability'),
+      e: document.getElementById('exposure'),
+      c: document.getElementById('consequence'),
+      note: document.getElementById('hazardBefore')
+    },
+    after: {
+      p: document.getElementById('probabilityAfter'),
+      e: document.getElementById('exposureAfter'),
+      c: document.getElementById('consequenceAfter'),
+      note: document.getElementById('controlMeasure')
+    },
+    cost: document.getElementById('correctionCost'),
+    costSlider: document.getElementById('correctionCostSlider'),
+    costUpperLimit: document.getElementById('costUpperLimit'),
+    costValueFactor: document.getElementById('costValueFactor'),
+    showAfterControls: document.getElementById('showAfterControls'),
+    showCostAnalysis: document.getElementById('showCostAnalysis')
+  };
+  const out = {
+    before: {
+      pVal: document.getElementById('pVal'),
+      eVal: document.getElementById('eVal'),
+      cVal: document.getElementById('cVal'),
+      pDesc: document.getElementById('pDesc'),
+      eDesc: document.getElementById('eDesc'),
+      cDesc: document.getElementById('cDesc'),
+      riskVal: document.getElementById('riskVal'),
+      riskBadge: document.getElementById('riskBadge'),
+      formulaText: document.getElementById('formulaText')
+    },
+    after: {
+      pVal: document.getElementById('pValAfter'),
+      eVal: document.getElementById('eValAfter'),
+      cVal: document.getElementById('cValAfter'),
+      pDesc: document.getElementById('pDescAfter'),
+      eDesc: document.getElementById('eDescAfter'),
+      cDesc: document.getElementById('cDescAfter'),
+      riskVal: document.getElementById('riskValAfter'),
+      riskBadge: document.getElementById('riskBadgeAfter'),
+      formulaText: document.getElementById('formulaTextAfter')
+    },
+    cost: {
+      reductionVal: document.getElementById('reductionVal'),
+      justifyVal: document.getElementById('justifyVal'),
+      justifyBadge: document.getElementById('justifyBadge'),
+      justifyFormula: document.getElementById('justifyFormula'),
+      costValueFactorVal: document.getElementById('costValueFactorVal'),
+      costSliderMaxLabel: document.getElementById('costSliderMaxLabel')
+    }
+  };
+  const workspace = document.querySelector('.workspace');
+  const controlGroups = document.getElementById('controlGroups');
+  const afterControlGroup = document.getElementById('afterControlGroup');
+  const costControlBox = document.getElementById('costControlBox');
+
+  const probabilityScale = [
+    {pos:0,  value:10.0, label:'Almost Certain'},
+    {pos:10, value:4.6,  label:'Quite Possible'},
+    {pos:20, value:2.1,  label:'Unusual but Possible'},
+    {pos:30, value:1.0,  label:'Remotely Possible'},
+    {pos:40, value:0.4,  label:'Conceivable, but very unlikely'},
+    {pos:50, value:0.2,  label:'Practically Impossible'}
+  ];
+  const exposureScale = [
+    {pos:0,  value:0.5, label:'Very Rare'},
+    {pos:10, value:0.9, label:'Rare'},
+    {pos:20, value:1.7, label:'Infrequent'},
+    {pos:30, value:3.0, label:'Occasional'},
+    {pos:40, value:5.5, label:'Frequent'},
+    {pos:50, value:10.0,label:'Continuous'}
+  ];
+  const consequenceScale = [
+    {pos:0,  value:100.0, label:'Catastrophe / Multiple Fatalities'},
+    {pos:10, value:39.8,  label:'Disaster / Fatality'},
+    {pos:20, value:15.8,  label:'Very Serious / Permanent Disability'},
+    {pos:30, value:6.3,   label:'Serious / Lost Time Injury'},
+    {pos:40, value:2.5,   label:'Substantial / Medical Treatment'},
+    {pos:50, value:1.0,   label:'Minor / Basic First Aid Treatment'}
+  ];
+
+  // Nomogram geometry. The axis scales are chosen so the two straight-line
+  // construction represents multiplication on logarithmic scales.
+  const geom = {
+    xP:360, xE:525, xT:675, xC:830, xR:955,
+    xPct:1120, xT2:1335, xCost:1440, xJ:1580,
+    yTop:48, yBottom:650,
+    // Extra left margin keeps this box clear of the Probability labels.
+    panelX:18, panelY:72, panelW:190, panelH:644
+  };
+
+  const firstT = (geom.xT - geom.xP) / (geom.xE - geom.xP);
+  const firstA = 1 - firstT;
+  const firstB = firstT;
+  const secondT = (geom.xR - geom.xT) / (geom.xC - geom.xT);
+  const secondA = 1 - secondT;
+  const secondB = secondT;
+
+  // Probability axis: fixed visually; remaining axes are solved from it.
+  const pAxis = makeLogAxis(10.0, 160, 0.2, 430);
+  const eSlope = (firstA * pAxis.a) / firstB;
+  const eAxis = makeAxisFromSlope(eSlope, 0.5, 230);
+  const tieSlope = firstA * pAxis.a;
+  const cSlope = (secondA * tieSlope) / secondB;
+  const cAxis = makeAxisFromSlope(cSlope, 100.0, 185);
+
+  const tieIntercept = firstA * pAxis.b + firstB * eAxis.b;
+  const riskSlope = secondA * tieSlope;
+  const riskIntercept = secondA * tieIntercept + secondB * cAxis.b;
+
+  function makeLogAxis(v1, y1, v2, y2){
+    const a = (y2 - y1) / (Math.log(v2) - Math.log(v1));
+    const b = y1 - a * Math.log(v1);
+    return {a,b, y:v => a * Math.log(v) + b};
+  }
+  function makeAxisFromSlope(a, vAt, yAt){
+    const b = yAt - a * Math.log(vAt);
+    return {a,b, y:v => a * Math.log(v) + b};
+  }
+  function riskY(r){
+    // Keep the lower limit so the log scale is valid, but do not cap high
+    // scores. This lets the risk-score point extend past the 900+ bar cap,
+    // and lets the cost-analysis line start from that actual point.
+    const v = Math.max(r,0.1);
+    return riskSlope * Math.log(v) + riskIntercept;
+  }
+  function lineYAtX(x1,y1,x2,y2,x){
+    return y1 + (x - x1) * (y2 - y1) / (x2 - x1);
+  }
+  function interpScale(pos, scale){
+    pos = Number(pos);
+    if(pos <= scale[0].pos) return scale[0].value;
+    if(pos >= scale[scale.length-1].pos) return scale[scale.length-1].value;
+    for(let i=0;i<scale.length-1;i++){
+      const a = scale[i], b = scale[i+1];
+      if(pos >= a.pos && pos <= b.pos){
+        const t = (pos - a.pos) / (b.pos - a.pos);
+        return Math.exp(Math.log(a.value) + t * (Math.log(b.value) - Math.log(a.value)));
+      }
+    }
+    return scale[scale.length-1].value;
+  }
+  function nearestLabel(pos, scale){
+    pos = Number(pos);
+    let best = scale[0];
+    for(const item of scale){
+      if(Math.abs(item.pos - pos) < Math.abs(best.pos - pos)) best = item;
+    }
+    if(Math.abs(best.pos - pos) <= 2) return best.label;
+    let low = scale[0], high = scale[1];
+    for(let i=0;i<scale.length-1;i++){
+      if(pos >= scale[i].pos && pos <= scale[i+1].pos){ low = scale[i]; high = scale[i+1]; break; }
+    }
+    return `${low.label} → ${high.label}`;
+  }
+  function fmt(v){
+    if(v >= 100) return v.toFixed(0);
+    if(v >= 10) return v.toFixed(1);
+    return v.toFixed(1);
+  }
+  function calcValue(v){
+    // Use the same rounded value shown beside the slider so the displayed
+    // formula and the displayed risk score always agree.
+    return Number(fmt(v));
+  }
+  function scoreCategory(score){
+    if(score >= 400) return {name:'Very High Risk', color:'#b91c1c', text:'#111'};
+    if(score >= 200) return {name:'High Risk', color:'#ef4444', text:'#111'};
+    if(score >= 50)  return {name:'Substantial Risk', color:'#f59e0b', text:'#111'};
+    if(score >= 10)  return {name:'Moderate Risk', color:'#fde047', text:'#111'};
+    return {name:'Low Risk', color:'#86efac', text:'#111'};
+  }
+  function roundedScore(score){
+    return Math.round(score * 10) / 10;
+  }
+
+  function clamp(v,min,max){
+    return Math.min(Math.max(v,min),max);
+  }
+  function riskReduction(beforeScore, afterScore){
+    if(beforeScore <= 0) return 0;
+    return clamp(((beforeScore - afterScore) / beforeScore) * 100, 0, 100);
+  }
+  function costScaleShiftY(valueFactor){
+    // Move the Costs for Correction scale opposite to the % Risk Reduction scale.
+    return -costValueShiftY(valueFactor);
+  }
+  function costHeaderY(valueFactor = 1){
+    // Keep the Costs for Correction label box attached to its moving scale,
+    // but slightly lower so it stays inside the cost-analysis border when
+    // the value scale moves the cost axis to its highest position.
+    return 165 + costScaleShiftY(valueFactor);
+  }
+  function normalisedCostUpperLimit(upperLimit = 1000000){
+    return Math.max(10, Number(upperLimit) || 1000000);
+  }
+  function costAxisMinimum(upperLimit = 1000000){
+    return normalisedCostUpperLimit(upperLimit) / 100000;
+  }
+  function costY(cost, valueFactor = 1, upperLimit = 1000000){
+    const maxCost = normalisedCostUpperLimit(upperLimit);
+    const minCost = costAxisMinimum(maxCost);
+    const rawCost = Number(cost);
+    const capped = clamp(Number.isFinite(rawCost) ? rawCost : 0, minCost, maxCost);
+    // True logarithmic cost scale based on the selected upper limit.
+    // Example: if the upper limit is $500,000, the visible major scale is
+    // $500k, $50k, $5k, $500, $50 and $5 while the bar size stays unchanged.
+    const t = (Math.log10(capped) - Math.log10(minCost)) / (Math.log10(maxCost) - Math.log10(minCost));
+    return 270 + t * 340 + costScaleShiftY(valueFactor);
+  }
+  function costAxisTop(valueFactor = 1){
+    return 270 + costScaleShiftY(valueFactor);
+  }
+  function costAxisBottom(valueFactor = 1){
+    return 610 + costScaleShiftY(valueFactor);
+  }
+  function costToSliderPosition(cost, upperLimit = 1000000){
+    const maxCost = normalisedCostUpperLimit(upperLimit);
+    const minCost = costAxisMinimum(maxCost);
+    const rawCost = Number(cost);
+    if(!Number.isFinite(rawCost) || rawCost <= minCost) return 0;
+    if(rawCost >= maxCost) return 100;
+    return ((Math.log10(rawCost) - Math.log10(minCost)) / (Math.log10(maxCost) - Math.log10(minCost))) * 100;
+  }
+  function sliderPositionToCost(position, upperLimit = 1000000){
+    const maxCost = normalisedCostUpperLimit(upperLimit);
+    const minCost = costAxisMinimum(maxCost);
+    const percent = clamp(position, 0, 100);
+    if(percent <= 0) return 0;
+    if(percent >= 100) return maxCost;
+    const logCost = Math.log10(minCost) + (percent / 100) * (Math.log10(maxCost) - Math.log10(minCost));
+    return Math.pow(10, logCost);
+  }
+  function costValueShiftY(valueFactor){
+    const raw = Number(valueFactor);
+    const factor = clamp(Number.isFinite(raw) ? raw : 1, 0, 2);
+    // 1.00× is the standard worksheet position. The slider is centred at 1.
+    // 2× moves the whole % risk reduction scale down for higher justification;
+    // 0× moves it up for lower justification.
+    return (factor - 1) * 45;
+  }
+  function reductionAxisTop(valueFactor = 1){
+    return 258 + costValueShiftY(valueFactor);
+  }
+  function reductionAxisBottom(valueFactor = 1){
+    return 392 + costValueShiftY(valueFactor);
+  }
+  function reductionHeaderY(valueFactor = 1){
+    return 188 + costValueShiftY(valueFactor);
+  }
+  function reductionY(reductionPct, valueFactor = 1){
+    const capped = clamp(reductionPct, 0, 100);
+    // Match the worksheet more closely: the % risk reduction scale is short.
+    return 270 + (capped / 100) * 110 + costValueShiftY(valueFactor);
+  }
+  function justificationY(score){
+    const capped = clamp(score, 2, 200);
+    const t = (Math.log10(capped) - Math.log10(2)) / (Math.log10(200) - Math.log10(2));
+    return 670 - t * 494;
+  }
+  function justificationFromY(y){
+    const t = clamp((670 - y) / 494, 0, 1);
+    return Math.pow(10, Math.log10(2) + t * (Math.log10(200) - Math.log10(2)));
+  }
+  function justificationScoreFromNomogram(beforeScore, reductionPct, cost, valueFactor = 1, upperLimit = 1000000){
+    // Matches the worksheet nomogram construction:
+    // 1) draw from the original/before-controls risk score through % risk reduction to the cost tie line;
+    // 2) draw from that tie point through correction cost to the justification score scale.
+    const yBeforeRisk = riskY(beforeScore);
+    const yReduction = reductionY(reductionPct, valueFactor);
+    const yTie = lineYAtX(geom.xR, yBeforeRisk, geom.xPct, yReduction, geom.xT2);
+    const yCorrectionCost = costY(cost, valueFactor, upperLimit);
+    const yJustification = lineYAtX(geom.xT2, yTie, geom.xCost, yCorrectionCost, geom.xJ);
+    return clamp(justificationFromY(yJustification), 2, 200);
+  }
+  function justificationCategory(score){
+    if(score >= 50) return {name:'Highly Justified', color:'#86efac', text:'#111'};
+    if(score >= 20) return {name:'Justified', color:'#fde047', text:'#111'};
+    if(score >= 10) return {name:'Marginal', color:'#f59e0b', text:'#111'};
+    return {name:'Doubtful Value', color:'#ef4444', text:'#111'};
+  }
+  function formatMoney(v){
+    return '$' + Math.round(v).toLocaleString('en-AU');
+  }
+  function formatMoneyAxis(v){
+    const value = Number(v) || 0;
+    const abs = Math.abs(value);
+    if(abs >= 1000000){
+      const m = value / 1000000;
+      return '$' + (Number.isInteger(m) ? m.toFixed(0) : m.toFixed(1).replace(/\.0$/,'')) + 'M';
+    }
+    if(abs >= 1000){
+      const k = value / 1000;
+      return '$' + (Number.isInteger(k) ? k.toFixed(0) : k.toFixed(1).replace(/\.0$/,'')) + 'k';
+    }
+    if(abs >= 1) return '$' + Math.round(value).toLocaleString('en-AU');
+    if(abs >= 0.01) return '$' + value.toFixed(2);
+    return '$' + value.toPrecision(2);
+  }
+  let lastCostUpperLimit = 1000000;
+  function readCostUpperLimit(options = {}){
+    if(!inputs.costUpperLimit) return lastCostUpperLimit;
+    const commit = !!options.commit;
+    const field = inputs.costUpperLimit;
+    const rawText = String(field.value).trim();
+    const raw = Number(rawText);
+
+    // While the user is typing, allow temporary values such as blank, 9,
+    // or 99 without rewriting the field on every keystroke. The last valid
+    // limit is used until the typed value becomes valid or the field loses focus.
+    if(rawText === '' || !Number.isFinite(raw) || raw <= 0){
+      if(commit){
+        lastCostUpperLimit = 10;
+        field.value = String(lastCostUpperLimit);
+      }
+      return lastCostUpperLimit;
+    }
+
+    const limit = Math.round(clamp(raw, 10, 100000000));
+    const isEditingThisField = document.activeElement === field;
+    if(commit || !isEditingThisField){
+      lastCostUpperLimit = limit;
+      field.value = String(lastCostUpperLimit);
+      return lastCostUpperLimit;
+    }
+
+    if(raw >= 10){
+      lastCostUpperLimit = limit;
+      return lastCostUpperLimit;
+    }
+
+    return lastCostUpperLimit;
+  }
+  function costAxisTicks(upperLimit){
+    const maxCost = normalisedCostUpperLimit(upperLimit);
+    // Six major logarithmic labels tied to the selected upper limit.
+    // For a $500,000 maximum this returns 5, 50, 500, 5,000, 50,000, 500,000.
+    return [5,4,3,2,1,0].map(power => maxCost / Math.pow(10, power));
+  }
+
+  function getDisplayMode(){
+    const showAfter = !!inputs.showAfterControls.checked;
+    const showCost = showAfter && !!inputs.showCostAnalysis.checked;
+    return {showAfter, showCost};
+  }
+
+  function applyDisplayMode(mode){
+    inputs.showCostAnalysis.disabled = !mode.showAfter;
+    afterControlGroup.classList.toggle('hidden', !mode.showAfter);
+    costControlBox.classList.toggle('hidden', !mode.showCost);
+    controlGroups.classList.toggle('single', !mode.showAfter);
+    workspace.classList.toggle('no-cost', !mode.showCost);
+
+    const targetWidth = mode.showCost ? 1660 : 1180;
+    if(canvas.width !== targetWidth){
+      canvas.width = targetWidth;
+      canvas.height = 720;
+    }
+    canvas.style.aspectRatio = `${targetWidth} / 720`;
+  }
+
+  function stateFromGroup(group){
+    // Probability and Consequence sliders are inverted in the UI so that
+    // 0 is the best case and 50 is the worst case. The calculation still
+    // uses the original scale positions internally.
+    const pPos = 50 - Number(group.p.value);
+    const ePos = Number(group.e.value);
+    const cPos = 50 - Number(group.c.value);
+    const p = calcValue(interpScale(pPos, probabilityScale));
+    const e = calcValue(interpScale(ePos, exposureScale));
+    const c = calcValue(interpScale(cPos, consequenceScale));
+    const score = roundedScore(p * e * c);
+    const cat = scoreCategory(score);
+    return {
+      p,e,c,score,cat,
+      note: group.note ? group.note.value.trim() : '',
+      pPos,
+      ePos,
+      cPos
+    };
+  }
+
+  function writeGroup(state, groupInputs, groupOut){
+    groupOut.pVal.textContent = fmt(state.p);
+    groupOut.eVal.textContent = fmt(state.e);
+    groupOut.cVal.textContent = fmt(state.c);
+    groupOut.pDesc.textContent = nearestLabel(state.pPos, probabilityScale);
+    groupOut.eDesc.textContent = nearestLabel(state.ePos, exposureScale);
+    groupOut.cDesc.textContent = nearestLabel(state.cPos, consequenceScale);
+    groupOut.riskVal.textContent = state.score.toFixed(1);
+    groupOut.riskBadge.textContent = state.cat.name;
+    groupOut.riskBadge.style.background = state.cat.color;
+    groupOut.riskBadge.style.color = state.cat.text;
+    groupOut.formulaText.textContent = `${fmt(state.p)} × ${fmt(state.e)} × ${fmt(state.c)} = ${state.score.toFixed(1)}`;
+  }
+
+  function writeCostAnalysis(before, after, analysis){
+    out.cost.reductionVal.textContent = analysis.reduction.toFixed(1) + '%';
+    out.cost.costValueFactorVal.textContent = analysis.valueFactor.toFixed(2) + '×';
+    out.cost.justifyVal.textContent = analysis.score.toFixed(1);
+    out.cost.justifyBadge.textContent = analysis.cat.name;
+    out.cost.justifyBadge.style.background = analysis.cat.color;
+    out.cost.justifyBadge.style.color = analysis.cat.text;
+    if(out.cost.costSliderMaxLabel){
+      out.cost.costSliderMaxLabel.textContent = formatMoney(analysis.costUpperLimit);
+    }
+    out.cost.justifyFormula.textContent = `Risk score ${before.score.toFixed(1)}, risk reduction ${analysis.reduction.toFixed(1)}%, correction cost ${formatMoney(analysis.cost)}, cost bar upper limit ${formatMoney(analysis.costUpperLimit)}, value scale ${analysis.valueFactor.toFixed(2)}× → justification score ${analysis.score.toFixed(1)}`;
+  }
+
+  function update(syncSliderFromCost = true){
+    const mode = getDisplayMode();
+    applyDisplayMode(mode);
+
+    const before = stateFromGroup(inputs.before);
+    const after = stateFromGroup(inputs.after);
+    const upperLimit = Math.round(readCostUpperLimit());
+    inputs.cost.max = upperLimit;
+    const rawCost = Number(inputs.cost.value);
+    const cost = clamp(Number.isFinite(rawCost) ? rawCost : 0, 0, upperLimit);
+    inputs.cost.value = Math.round(cost);
+    if(syncSliderFromCost){
+      inputs.costSlider.value = costToSliderPosition(cost, upperLimit).toFixed(1);
+    }
+    const rawValueFactor = Number(inputs.costValueFactor.value);
+    const valueFactor = clamp(Number.isFinite(rawValueFactor) ? rawValueFactor : 1, 0, 2);
+    inputs.costValueFactor.value = valueFactor;
+    const reduction = riskReduction(before.score, after.score);
+    const justifyScore = justificationScoreFromNomogram(before.score, reduction, cost, valueFactor, upperLimit);
+    const justifyCat = justificationCategory(justifyScore);
+    const costAnalysis = {cost, costUpperLimit: upperLimit, reduction, valueFactor, score: justifyScore, cat: justifyCat};
+
+    writeGroup(before, inputs.before, out.before);
+    writeGroup(after, inputs.after, out.after);
+    writeCostAnalysis(before, after, costAnalysis);
+
+    draw(before, after, costAnalysis, mode);
+  }
+
+  function draw(before, after, costAnalysis, mode){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = '#f3f3f3';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    drawTitle(mode);
+    drawParameterPanel(before, after, costAnalysis, mode);
+    drawRiskBands();
+    drawAxes();
+    drawConstruction(before, after, mode);
+    if(mode.showCost){
+      drawCostAnalysis(before, after, costAnalysis);
+    }
+    drawNotesLegendBox(before, after, mode);
+    drawTopLegend(mode);
+    drawFooterNote();
+  }
+
+  function drawTitle(mode){
+    ctx.save();
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 20px Arial';
+    ctx.fillText('Risk Score Calculator', 22, 34);
+    ctx.font = '12px Arial';
+    ctx.fillStyle = '#5f6d7a';
+    ctx.fillText('Probability × Exposure × Consequence = Risk Score', 22, 54);
+    ctx.restore();
+  }
+
+  function drawTopLegend(mode){
+    ctx.save();
+    const rows = [
+      {text:'Before Controls', color:'#111827'}
+    ];
+    if(mode.showAfter){
+      rows.push({text:'After Controls', color:'#2563eb'});
+    }
+    if(mode.showCost){
+      rows.push({text:'Cost Analysis', color:'#d62828'});
+    }
+
+    // Keep the same fixed box shape; only move it below the Risk Score line.
+    ctx.font = '12px Arial';
+    const w = 176;
+    const h = 62;
+    const x = clamp(geom.xR - w / 2, 12, canvas.width - w - 12);
+    const y = canvas.height - h - 8;
+    roundRect(x, y, w, h, 6, 'rgba(255,255,255,0.94)', '#8b97a5');
+
+    ctx.textAlign = 'left';
+    rows.forEach((row, i) => {
+      const ly = y + 17 + i * 18;
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = row.color;
+      ctx.beginPath();
+      ctx.moveTo(x + 12, ly);
+      ctx.lineTo(x + 40, ly);
+      ctx.stroke();
+      ctx.fillStyle = '#111827';
+      ctx.fillText(row.text, x + 48, ly + 4);
+    });
+    ctx.restore();
+  }
+
+  function drawNotesLegendBox(before, after, mode){
+    ctx.save();
+    const x = 222;
+    const y = 452;
+    const rightPad = 12;
+    const bottomPad = 4;
+    const w = (geom.xE - rightPad) - x;
+    const h = canvas.height - y - bottomPad;
+    roundRect(x, y, w, h, 8, 'rgba(255,255,255,0.94)', '#8b97a5');
+
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('Assessment Notes', x + 12, y + 22);
+
+    const pad = 8;
+    const boxX = x + pad;
+    const boxW = w - pad * 2;
+    const boxTop = y + 34;
+    const boxBottom = y + h - pad;
+    const gap = mode.showAfter ? 6 : 0;
+    const boxH = mode.showAfter ? (boxBottom - boxTop - gap) / 2 : (boxBottom - boxTop);
+
+    drawAssessmentNoteBox(boxX, boxTop, boxW, boxH, '#111827', 'Before Controls', 'Hazard before controls', before.note || '—');
+    if(mode.showAfter){
+      drawAssessmentNoteBox(boxX, boxTop + boxH + gap, boxW, boxH, '#2563eb', 'After Controls', 'Control measure', after.note || '—');
+    }
+    ctx.restore();
+  }
+
+  function drawAssessmentNoteBox(x, y, w, h, accent, legendText, label, text){
+    ctx.save();
+    roundRect(x, y, w, h, 5, 'rgba(255,255,255,0.96)', '#c5ccd6');
+
+    ctx.fillStyle = accent;
+    ctx.font = 'bold 12px Arial';
+    ctx.fillText(legendText, x + 8, y + 20);
+
+    ctx.font = 'bold 11px Arial';
+    ctx.fillStyle = '#273444';
+    ctx.fillText(label + ':', x + 8, y + 40);
+
+    ctx.font = '11px Arial';
+    ctx.fillStyle = '#273444';
+    const maxLines = Math.max(1, Math.floor((h - 50) / 13));
+    const lines = wrapLines(text || '—', w - 16, maxLines);
+    lines.forEach((line, i) => ctx.fillText(line, x + 8, y + 56 + i * 13));
+    ctx.restore();
+  }
+
+  function drawParameterPanel(before, after, costAnalysis, mode){
+    const {panelX:x,panelY:y,panelW:w} = geom;
+    const sectionGap = 6;
+    const riskSectionH = 186;
+    const costSectionH = 214;
+    const sectionY = y + 42;
+    const afterY = sectionY + riskSectionH + sectionGap;
+    const costY = afterY + riskSectionH + sectionGap;
+    const h = mode.showCost
+      ? (costY - y + costSectionH + 4)
+      : (mode.showAfter ? (afterY - y + riskSectionH + 8) : (sectionY - y + riskSectionH + 8));
+    ctx.save();
+    roundRect(x,y,w,h,8,'#fafafa','#8b97a5');
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 15px Arial';
+    ctx.fillText('Risk Parameters', x+12, y+25);
+
+    drawPanelSection('Before Controls', before, x+12, sectionY, w-24, '#111827');
+    if(mode.showAfter){
+      drawPanelSection('After Controls', after, x+12, afterY, w-24, '#2563eb');
+    }
+    if(mode.showCost){
+      drawCanvasCostSection(costAnalysis, x+12, costY, w-24);
+    }
+    ctx.restore();
+  }
+
+  function drawPanelSection(title, state, x, y, w, accent){
+    ctx.save();
+    ctx.strokeStyle = '#d3d8df';
+    ctx.strokeRect(x, y, w, 186);
+    ctx.fillStyle = accent;
+    ctx.font = 'bold 13px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(title, x+8, y+18);
+
+    const labelX = x + 8;
+    const valueX = x + w - 10;
+    const rows = [
+      ['Probability', fmt(state.p), y + 44],
+      ['Exposure', fmt(state.e), y + 70],
+      ['Consequence', fmt(state.c), y + 96]
+    ];
+
+    rows.forEach(([label, value, rowY]) => {
+      ctx.font = '12px Arial';
+      ctx.fillStyle = '#273444';
+      ctx.textAlign = 'left';
+      ctx.fillText(label, labelX, rowY);
+      ctx.font = 'bold 12px Arial';
+      ctx.textAlign = 'right';
+      ctx.fillText(value, valueX, rowY);
+    });
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 14px Arial';
+    ctx.fillText('Risk', labelX, y+130);
+    ctx.font = 'bold 22px Arial';
+    ctx.fillText(state.score.toFixed(1), x+55, y+132);
+
+    const pillW = 110;
+    const pillH = 22;
+    const pillX = x + 8;
+    const pillY = y + 154;
+    ctx.font = 'bold 11px Arial';
+    roundRect(pillX,pillY,pillW,pillH,11,state.cat.color,'rgba(0,0,0,.25)');
+    ctx.fillStyle = state.cat.text;
+    ctx.textAlign = 'center';
+    ctx.fillText(shortRiskName(state.cat.name), pillX + pillW/2, pillY + 15);
+    ctx.restore();
+  }
+
+  function drawCanvasCostSection(analysis, x, y, w){
+    ctx.save();
+    ctx.strokeStyle = '#d3d8df';
+    ctx.strokeRect(x, y, w, 214);
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 13px Arial';
+    ctx.fillText('Cost Analysis', x+8, y+18);
+
+    ctx.font = '12px Arial';
+    ctx.fillStyle = '#273444';
+    ctx.fillText('Risk Reduction', x+8, y+42);
+    ctx.fillText(analysis.reduction.toFixed(1) + '%', x+20, y+58);
+
+    ctx.fillText('Cost for Correction', x+8, y+82);
+    ctx.fillText(formatMoney(analysis.cost), x+20, y+98);
+
+    ctx.fillText('Cost Bar Upper Limit', x+8, y+122);
+    ctx.fillText(formatMoney(analysis.costUpperLimit), x+20, y+138);
+
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 13px Arial';
+    ctx.fillText('Justification', x+8, y+156);
+    ctx.font = 'bold 22px Arial';
+    ctx.fillText(analysis.score.toFixed(1), x+20, y+176);
+
+    const pillW = 110;
+    const pillH = 22;
+    const pillX = x + 8;
+    const pillY = y + 186;
+    ctx.font = 'bold 11px Arial';
+    roundRect(pillX,pillY,pillW,pillH,11,analysis.cat.color,'rgba(0,0,0,.25)');
+    ctx.fillStyle = analysis.cat.text;
+    ctx.textAlign = 'center';
+    ctx.fillText(shortRiskName(analysis.cat.name), pillX + pillW/2, pillY + 15);
+    ctx.restore();
+  }
+
+  function shortRiskName(name){
+    return name.replace(' Risk','');
+  }
+
+  function drawAxes(){
+    ctx.save();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#1f2933';
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 16px Arial';
+
+    ctx.fillText('Probability', geom.xP-62, 122);
+    ctx.fillText('Exposure', geom.xE-32, 192);
+    ctx.fillText('Tie line', geom.xT-24, 32);
+    ctx.fillText('Consequence', geom.xC-62, 154);
+    ctx.fillText('Risk Score', geom.xR-34, 32);
+
+    drawScaleAxis(geom.xP, pAxis.y(10), pAxis.y(0.2));
+    drawScaleAxis(geom.xE, eAxis.y(0.5), eAxis.y(10));
+    drawScaleAxis(geom.xC, cAxis.y(100), cAxis.y(1));
+
+    ctx.save();
+    ctx.setLineDash([5,5]);
+    ctx.strokeStyle = '#6b7280';
+    ctx.beginPath();
+    ctx.moveTo(geom.xT, geom.yTop);
+    ctx.lineTo(geom.xT, geom.yBottom);
+    ctx.stroke();
+    ctx.restore();
+
+    drawTickLabels(probabilityScale, geom.xP, pAxis.y, 'left', [
+      'Almost Certain','Quite Possible','Unusual but Possible','Remotely Possible','Conceivable\n(but very unlikely)','Practically Impossible'
+    ]);
+    drawTickLabels(exposureScale, geom.xE, eAxis.y, 'right', [
+      'Very Rare','Rare','Infrequent','Occasional','Frequent','Continuous'
+    ]);
+    drawConsequenceTicks();
+    ctx.restore();
+  }
+
+  function drawScaleAxis(x,y1,y2){
+    ctx.beginPath();
+    ctx.moveTo(x,y1);
+    ctx.lineTo(x,y2);
+    ctx.stroke();
+  }
+
+  function drawTickLabels(scale, x, yFunc, side, labels){
+    ctx.save();
+    ctx.font = '12px Arial';
+    ctx.fillStyle = '#1f2933';
+    ctx.strokeStyle = '#1f2933';
+    for(let i=0;i<scale.length;i++){
+      const y = yFunc(scale[i].value);
+      ctx.beginPath();
+      ctx.moveTo(x-6,y); ctx.lineTo(x+6,y); ctx.stroke();
+      const lines = String(labels[i]).split('\n');
+      ctx.textAlign = side === 'left' ? 'right' : 'left';
+      const tx = side === 'left' ? x-12 : x+12;
+      const startY = y - (lines.length-1)*7 + 4;
+      for(let j=0;j<lines.length;j++) ctx.fillText(lines[j], tx, startY + j*14);
+      ctx.save();
+      ctx.fillStyle = '#627386';
+      ctx.textAlign = side === 'left' ? 'left' : 'right';
+      ctx.fillText(fmt(scale[i].value), side === 'left' ? x+12 : x-12, y+4);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  function drawConsequenceTicks(){
+    const leftLabels = ['Multiple Fatalities','Fatality','Permanent Disability','Lost Time Injury','Medical Treatment','Basic First Aid Treatment'];
+    const rightLabels = ['Catastrophe','Disaster','Very Serious','Serious','Substantial','Minor'];
+    ctx.save();
+    ctx.font = '12px Arial';
+    ctx.fillStyle = '#1f2933';
+    ctx.strokeStyle = '#1f2933';
+    for(let i=0;i<consequenceScale.length;i++){
+      const y = cAxis.y(consequenceScale[i].value);
+      ctx.beginPath();
+      ctx.moveTo(geom.xC-6,y); ctx.lineTo(geom.xC+6,y); ctx.stroke();
+      ctx.textAlign = 'right';
+      ctx.fillText(leftLabels[i], geom.xC-12, y+4);
+      ctx.textAlign = 'left';
+      ctx.fillText(rightLabels[i], geom.xC+12, y+4);
+      ctx.save();
+      ctx.fillStyle = '#627386';
+      ctx.textAlign = 'center';
+      ctx.fillText(fmt(consequenceScale[i].value), geom.xC, y-8);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  function drawRiskBands(){
+    const x = geom.xR - 14;
+    const w = 28;
+    const rTop = riskY(900);
+    const rBottom = riskY(0.1);
+    const bands = [
+      {name:'Very High Risk', lo:400, hi:900, color:'#7f1d1d', text:'#111'},
+      {name:'High Risk', lo:200, hi:400, color:'#ef4444', text:'#111'},
+      {name:'Substantial Risk', lo:50, hi:200, color:'#f59e0b', text:'#111'},
+      {name:'Moderate Risk', lo:10, hi:50, color:'#fde047', text:'#111'},
+      {name:'Low Risk', lo:0.1, hi:10, color:'#86efac', text:'#111'}
+    ];
+    ctx.save();
+    for(const b of bands){
+      const yHi = riskY(b.hi);
+      const yLo = riskY(b.lo);
+      ctx.fillStyle = b.color;
+      ctx.fillRect(x, yHi, w, yLo-yHi);
+      ctx.strokeStyle = 'rgba(0,0,0,.25)';
+      ctx.strokeRect(x, yHi, w, yLo-yHi);
+      ctx.save();
+      ctx.fillStyle = b.text;
+      ctx.font = 'bold 12px Arial';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      wrapText(b.name, x+w+8, (yHi+yLo)/2-8, 88, 13);
+      ctx.restore();
+    }
+
+    ctx.strokeStyle = '#111827';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, rTop, w, rBottom-rTop);
+    ctx.font = '11px Arial';
+    ctx.fillStyle = '#273444';
+    ctx.textAlign = 'right';
+    [900,400,200,50,10,0.1].forEach(v => {
+      const y = riskY(v);
+      ctx.beginPath(); ctx.moveTo(x-7,y); ctx.lineTo(x,y); ctx.stroke();
+      ctx.fillText(v === 900 ? '900+' : String(v), x-10, y+4);
+    });
+    ctx.restore();
+  }
+
+  function drawConstruction(before, after, mode){
+    ctx.save();
+
+    // Light projection guides from the active points.
+    ctx.strokeStyle = 'rgba(31,41,51,.14)';
+    ctx.lineWidth = 1;
+    const guidePoints = [
+      [geom.xP,pAxis.y(before.p)], [geom.xE,eAxis.y(before.e)], [geom.xC,cAxis.y(before.c)], [geom.xR,riskY(before.score)]
+    ];
+    if(mode.showAfter){
+      guidePoints.push([geom.xP,pAxis.y(after.p)], [geom.xE,eAxis.y(after.e)], [geom.xC,cAxis.y(after.c)], [geom.xR,riskY(after.score)]);
+    }
+    guidePoints.forEach(pt => {
+      ctx.beginPath(); ctx.moveTo(pt[0]-18,pt[1]); ctx.lineTo(pt[0]+18,pt[1]); ctx.stroke();
+    });
+
+    drawScenarioLine(before, '#111827', '#111827', ['P','E','C','Risk']);
+    if(mode.showAfter){
+      drawScenarioLine(after, '#2563eb', '#2563eb', ['P','E','C','Risk']);
+    }
+
+    ctx.restore();
+  }
+
+  function drawScenarioLine(state, lineColor, pointColor, labels){
+    const xP = geom.xP;
+    const xE = geom.xE;
+    const xT = geom.xT;
+    const xC = geom.xC;
+    const xR = geom.xR;
+    const yP = pAxis.y(state.p);
+    const yE = eAxis.y(state.e);
+    const yT = lineYAtX(xP,yP,xE,yE,xT);
+    const yC = cAxis.y(state.c);
+    const yRRaw = lineYAtX(xT,yT,xC,yC,xR);
+    const yR = riskY(state.score);
+
+    ctx.save();
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 3.2;
+    ctx.beginPath();
+    ctx.moveTo(xP, yP);
+    ctx.lineTo(xT, yT);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(xT, yT);
+    ctx.lineTo(xR, yRRaw);
+    ctx.stroke();
+
+    drawPoint(xP,yP,pointColor,labels[0]);
+    drawPoint(xE,yE,pointColor,labels[1]);
+    drawPoint(xT,yT,lineColor,'Tie');
+    drawPoint(xC,yC,pointColor,labels[2]);
+    drawPoint(xR,yR,lineColor,labels[3]);
+
+    if(state.score > 900){
+      ctx.save();
+      ctx.fillStyle = lineColor;
+      ctx.font = 'bold 12px Arial';
+      ctx.textAlign = 'left';
+      ctx.fillText('actual score exceeds bar cap', xR+26, riskY(900)-8);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  function drawPoint(x,y,color,label){
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x,y,6,0,Math.PI*2);
+    ctx.fill(); ctx.stroke();
+    ctx.font = 'bold 11px Arial';
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.fillText(label, x, y-10);
+    ctx.restore();
+  }
+
+  function drawCostAnalysis(before, after, analysis){
+    ctx.save();
+
+    const xPct = geom.xPct;
+    const xT2 = geom.xT2;
+    const xCost = geom.xCost;
+    const xJ = geom.xJ;
+
+    // Light border around the cost analysis section. Keep it far enough
+    // right so it does not clash with the Risk Score labels, while still
+    // enclosing all cost-analysis text.
+    roundRect(xPct - 60, 110, (xJ - xPct) + 120, 595, 8, 'rgba(255,255,255,0.35)', '#aeb7c2');
+
+    const yBeforeRisk = riskY(before.score);
+    const yRed = reductionY(analysis.reduction, analysis.valueFactor);
+    const yCost = costY(analysis.cost, analysis.valueFactor, analysis.costUpperLimit);
+    const yTie = lineYAtX(geom.xR, yBeforeRisk, xPct, yRed, xT2);
+    const yJust = lineYAtX(xT2, yTie, xCost, yCost, xJ);
+
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText('Cost Analysis', xPct - 25, 108);
+
+    drawDarkHeader('%\nRisk\nReduction', xPct - 42, reductionHeaderY(analysis.valueFactor), 84, 50);
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Tie Line', xT2, 144);
+    drawDarkHeader('Costs\nfor\nCorrection', xCost - 54, costHeaderY(analysis.valueFactor), 108, 62);
+    drawDarkHeader('Justification\nScore', xJ - 55, 124, 110, 42);
+
+    // Risk reduction axis
+    ctx.strokeStyle = '#1f2933';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(xPct, reductionAxisTop(analysis.valueFactor)); ctx.lineTo(xPct, reductionAxisBottom(analysis.valueFactor)); ctx.stroke();
+    ctx.font = '12px Arial';
+    ctx.fillStyle = '#273444';
+    ctx.textAlign = 'left';
+    [10,50,100].forEach(v => {
+      const y = reductionY(v, analysis.valueFactor);
+      ctx.beginPath(); ctx.moveTo(xPct, y); ctx.lineTo(xPct+10, y); ctx.stroke();
+      ctx.fillText(v + '%', xPct + 14, y + 4);
+    });
+    // Intermediate labels, shown beside the line like the reference sheet.
+    ctx.fillText('25%', xPct - 36, reductionY(25, analysis.valueFactor) + 4);
+    ctx.fillText('75%', xPct - 36, reductionY(75, analysis.valueFactor) + 4);
+
+    // Tie line
+    ctx.save();
+    ctx.strokeStyle = '#111827';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5,5]);
+    ctx.beginPath(); ctx.moveTo(xT2, 176); ctx.lineTo(xT2, 640); ctx.stroke();
+    ctx.restore();
+
+    // Cost axis
+    ctx.strokeStyle = '#1f2933';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(xCost, costAxisTop(analysis.valueFactor)); ctx.lineTo(xCost, costAxisBottom(analysis.valueFactor)); ctx.stroke();
+    ctx.textAlign = 'right';
+    costAxisTicks(analysis.costUpperLimit).forEach(v => {
+      const y = costY(v, analysis.valueFactor, analysis.costUpperLimit);
+      ctx.beginPath(); ctx.moveTo(xCost-10, y); ctx.lineTo(xCost, y); ctx.stroke();
+      ctx.fillText(formatMoneyAxis(v), xCost - 14, y + 4);
+    });
+
+    // Justification score axis with coloured bands like the risk score bar.
+    const jBandX = xJ - 14;
+    const jBandW = 28;
+    [
+      {hi:200, lo:50, color:'#86efac'},
+      {hi:50, lo:20, color:'#fde047'},
+      {hi:20, lo:10, color:'#f59e0b'},
+      {hi:10, lo:2, color:'#ef4444'}
+    ].forEach(b => {
+      const yHi = justificationY(b.hi);
+      const yLo = justificationY(b.lo);
+      ctx.fillStyle = b.color;
+      ctx.fillRect(jBandX, yHi, jBandW, yLo - yHi);
+      ctx.strokeStyle = 'rgba(0,0,0,.18)';
+      ctx.strokeRect(jBandX, yHi, jBandW, yLo - yHi);
+    });
+    ctx.strokeStyle = '#111827';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(xJ, 176); ctx.lineTo(xJ, 670); ctx.stroke();
+    ctx.textAlign = 'right';
+    [200,100,80,50,30,20,10,5,2].forEach(v => {
+      const y = justificationY(v);
+      ctx.beginPath(); ctx.moveTo(xJ-10, y); ctx.lineTo(xJ, y); ctx.stroke();
+      ctx.fillText(String(v), xJ - 18, y + 4);
+    });
+    ctx.textAlign = 'left';
+    ctx.fillText('Highly', xJ + 14, justificationY(50)-6);
+    ctx.fillText('Justified', xJ + 14, justificationY(50)+8);
+    ctx.fillText('Justified', xJ + 14, justificationY(20)+4);
+    ctx.fillText('Of', xJ + 14, justificationY(10)-6);
+    ctx.fillText('Doubtful', xJ + 14, justificationY(10)+8);
+    ctx.fillText('Value', xJ + 14, justificationY(10)+22);
+
+    // Construction line: before-controls risk score through risk reduction to tie line,
+    // then from tie line through correction cost to justification score.
+    ctx.strokeStyle = '#d62828';
+    ctx.lineWidth = 3.2;
+    ctx.beginPath();
+    ctx.moveTo(geom.xR, yBeforeRisk);
+    ctx.lineTo(xPct, yRed);
+    ctx.lineTo(xT2, yTie);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(xT2, yTie);
+    ctx.lineTo(xJ, yJust);
+    ctx.stroke();
+
+    drawPoint(geom.xR, yBeforeRisk, '#d62828', before.score.toFixed(0));
+    drawPoint(xPct, yRed, '#d62828', analysis.reduction.toFixed(0) + '%');
+    drawPoint(xT2, yTie, '#d62828', 'Tie');
+    drawPoint(xCost, yCost, '#d62828', '$');
+    drawPoint(xJ, yJust, '#d62828', analysis.score.toFixed(0));
+
+    // Risk reduction calculation text block.
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'left';
+    const calcX = xPct - 54;
+    const calcY = 664;
+    const calcLines = [
+      `Risk score: ${before.score.toFixed(1)}`,
+      `Risk reduction: ((${before.score.toFixed(1)} - ${after.score.toFixed(1)}) / ${before.score.toFixed(1)}) × 100 = ${analysis.reduction.toFixed(1)}%`,
+      `Cost for correction: ${formatMoney(analysis.cost)}`
+    ];
+    const calcPadX = 5;
+    const calcPadY = 4;
+    const calcLineH = 16;
+    const calcW = Math.max(...calcLines.map(t => ctx.measureText(t).width));
+    const calcBoxX = calcX - calcPadX;
+    const calcBoxY = calcY - 12 - calcPadY;
+    const calcBoxW = calcW + calcPadX * 2;
+    const calcBoxH = (calcLines.length - 1) * calcLineH + 16 + calcPadY * 2;
+    // Draw last so the calculation note sits above construction lines.
+    // The fill is lightly translucent so the blue construction line can
+    // still be seen underneath without making the text hard to read.
+    roundRect(calcBoxX, calcBoxY, calcBoxW, calcBoxH, 4, 'rgba(248,250,252,0.82)', '#8b97a5');
+    ctx.fillStyle = '#111827';
+    calcLines.forEach((line, i) => ctx.fillText(line, calcX, calcY + i * calcLineH));
+
+    ctx.restore();
+  }
+
+  function drawDarkHeader(text, x, y, w, h){
+    ctx.save();
+    roundRect(x,y,w,h,2,'#30343b',null);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 13px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const lines = String(text).split('\n');
+    const startY = y + h/2 - (lines.length-1)*7;
+    for(let i=0;i<lines.length;i++){
+      ctx.fillText(lines[i], x+w/2, startY + i*14);
+    }
+    ctx.restore();
+  }
+
+  function drawFooterNote(){
+    ctx.save();
+    const footerText = 'Copyright © 2026. Designed and programmed by Aaron Lederhose';
+    ctx.font = '11px Arial';
+    ctx.fillStyle = '#7a8794';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(footerText, canvas.width - 14, canvas.height - 8);
+    ctx.restore();
+  }
+
+  function wrapText(text, x, y, maxWidth, lineHeight){
+    const words = text.split(' ');
+    let line = '';
+    for(let n=0;n<words.length;n++){
+      const test = line ? line + ' ' + words[n] : words[n];
+      if(ctx.measureText(test).width > maxWidth && n > 0){
+        ctx.fillText(line, x, y);
+        line = words[n];
+        y += lineHeight;
+      } else {
+        line = test;
+      }
+    }
+    ctx.fillText(line, x, y);
+  }
+
+  function wrapLines(text, maxWidth, maxLines){
+    const content = String(text || '').trim();
+    if(!content) return ['—'];
+    const words = content.split(/\s+/);
+    const lines = [];
+    let line = '';
+    for(let i=0;i<words.length;i++){
+      const test = line ? line + ' ' + words[i] : words[i];
+      if(ctx.measureText(test).width > maxWidth && line){
+        lines.push(line);
+        line = words[i];
+        if(lines.length === maxLines - 1){
+          break;
+        }
+      } else {
+        line = test;
+      }
+    }
+    let remaining = '';
+    if(lines.length < maxLines){
+      remaining = line;
+      const usedWords = lines.join(' ').split(/\s+/).filter(Boolean).length + (line ? line.split(/\s+/).filter(Boolean).length : 0);
+      if(usedWords < words.length){
+        const rest = words.slice(usedWords).join(' ');
+        remaining = (remaining ? remaining + ' ' : '') + rest;
+      }
+      while(ctx.measureText(remaining).width > maxWidth && remaining.length > 0){
+        remaining = remaining.slice(0, -1);
+      }
+      if(remaining !== content && !remaining.endsWith('…')) remaining = remaining.replace(/[\s.,;:!?-]*$/, '') + '…';
+      lines.push(remaining || '—');
+    }
+    return lines.slice(0, maxLines);
+  }
+
+  function roundRect(x,y,w,h,r,fill,stroke){
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.lineTo(x+w-r,y);
+    ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r);
+    ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h);
+    ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r);
+    ctx.quadraticCurveTo(x,y,x+r,y);
+    ctx.closePath();
+    if(fill){ ctx.fillStyle = fill; ctx.fill(); }
+    if(stroke){ ctx.strokeStyle = stroke; ctx.stroke(); }
+    ctx.restore();
+  }
+
+  function savePng(){
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'risk-score-calculator.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  async function copyImage(){
+    try{
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+      await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+      alert('Image copied to clipboard.');
+    }catch(err){
+      alert('Copy image was blocked by the browser. Use Save to PNG instead.');
+    }
+  }
+
+  function reset(){
+    // Defaults match the previous calculated values, but with Probability
+    // and Consequence slider direction inverted.
+    inputs.before.p.value = 50;
+    inputs.before.e.value = 20;
+    inputs.before.c.value = 10;
+    inputs.after.p.value = 30;
+    inputs.after.e.value = 10;
+    inputs.after.c.value = 10;
+    if(inputs.before.note) inputs.before.note.value = '';
+    if(inputs.after.note) inputs.after.note.value = '';
+    if(inputs.costUpperLimit) inputs.costUpperLimit.value = 1000000;
+    inputs.cost.max = 1000000;
+    inputs.cost.value = 900;
+    inputs.costSlider.value = costToSliderPosition(900, 1000000).toFixed(1);
+    inputs.costValueFactor.value = 1;
+    inputs.showAfterControls.checked = true;
+    inputs.showCostAnalysis.checked = true;
+    update();
+  }
+
+  [inputs.before, inputs.after].forEach(group => Object.values(group).forEach(input => input.addEventListener('input', () => update())));
+  inputs.cost.addEventListener('input', () => update(true));
+  if(inputs.costUpperLimit){
+    inputs.costUpperLimit.addEventListener('change', () => {
+      readCostUpperLimit({commit:true});
+      update(true);
+    });
+    inputs.costUpperLimit.addEventListener('blur', () => {
+      readCostUpperLimit({commit:true});
+      update(true);
+    });
+  }
+  inputs.costSlider.addEventListener('input', () => {
+    const cost = sliderPositionToCost(Number(inputs.costSlider.value), readCostUpperLimit());
+    inputs.cost.value = Math.round(cost);
+    update(false);
+  });
+  inputs.costValueFactor.addEventListener('input', () => update(false));
+  inputs.showAfterControls.addEventListener('change', () => {
+    if(!inputs.showAfterControls.checked){
+      inputs.showCostAnalysis.checked = false;
+    }
+    // Turning After Controls back on should only show After Controls.
+    // Cost Analysis stays off until its own checkbox is selected.
+    update(false);
+  });
+  inputs.showCostAnalysis.addEventListener('change', () => update(false));
+  document.getElementById('printBtn').addEventListener('click', () => window.print());
+  document.getElementById('saveBtn').addEventListener('click', savePng);
+  document.getElementById('copyBtn').addEventListener('click', copyImage);
+  document.getElementById('resetBtn').addEventListener('click', reset);
+
+  update();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<svg class="" viewBox="0 -20 430 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Might Help">
+      <defs>
+        <linearGradient id="mh-logo-file-left-page" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#0ea6a8"/><stop offset="100%" stop-color="#3882f6"/></linearGradient>
+        <linearGradient id="mh-logo-file-right-page" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#7b61ff"/><stop offset="100%" stop-color="#3882f6"/></linearGradient>
+      </defs>
+      <g transform="translate(-16 0)">
+        <path fill="#0f172a" d="M55 175 V101 C55 69 75 49 104 49 C126 49 143 59 153 76 C163 59 180 49 203 49 C234 49 254 70 254 101 V175 H220 V102 C220 84 211 74 196 74 C180 74 171 85 171 102 V175 H136 V102 C136 84 127 74 112 74 C97 74 89 85 89 102 V175 Z"/>
+        <path fill="#0f172a" d="M271 175 V0 L305 -12 V74 C316 57 333 49 355 49 C387 49 407 70 407 101 V175 H373 V102 C373 84 364 74 348 74 C322 74 305 90 305 114 V175 Z"/>
+      </g>
+      <path d="M36 204 C108 202 160 212 211 236" fill="none" stroke="url(#mh-logo-file-left-page)" stroke-width="10" stroke-linecap="round"/>
+      <path d="M211 236 C262 212 314 202 394 204" fill="none" stroke="url(#mh-logo-file-right-page)" stroke-width="10" stroke-linecap="round"/>
+      <path d="M36 228 C109 226 161 234 211 258" fill="none" stroke="url(#mh-logo-file-left-page)" stroke-width="8" stroke-linecap="round"/>
+      <path d="M211 258 C261 234 313 226 394 228" fill="none" stroke="url(#mh-logo-file-right-page)" stroke-width="8" stroke-linecap="round"/>
+      <text x="215" y="333" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="57" font-weight="600" letter-spacing="-2.5" fill="#0f172a">might help</text>
+    </svg>

@@ -1,4 +1,4 @@
-# Might Help — Public Website
+# Might Help — Public Website and Handwriting Workbench
 
 This folder is the PUBLIC GitHub repository content for:
 
@@ -13,11 +13,14 @@ Configure:
 - Folder: /docs
 - Custom domain: mighthelp.com.au
 
-Only the contents of `docs/` are published by GitHub Pages.
+Only the contents of `docs/` are published by GitHub Pages. The generated
+user-only Handwriting Workbench is located at
+`docs/tools/handwriting-workbench/index.html`.
 
 ## Important
 
 This public repository intentionally contains only the finished website files.
 
-The offline editor, build scripts and backups are kept separately in the
-Local-Editor package and should not be uploaded to this public repository.
+The complete Handwriting Workbench Admin Editor, offline website editor,
+private master library, build scripts and backups are kept separately in the
+Local-Editor package and must not be uploaded to this public repository.
