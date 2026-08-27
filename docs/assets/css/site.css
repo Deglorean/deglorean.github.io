@@ -150,9 +150,7 @@ to{transform:translateX(0);opacity:1}
 }
 /* Handwriting animation generated from Handwriting Workbench centreline data */
 .writing-demo{width:min(100%,680px);padding:16px;border:1px solid rgba(210,221,232,.92);border-radius:20px;background:rgba(255,255,255,.97);box-shadow:0 22px 55px rgba(15,23,42,.22)}
-.writing-demo-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:5px;color:#52606d;font-size:.78rem;font-weight:850}
-.writing-demo-toolbar button{min-height:32px;padding:5px 10px;border:1px solid #c8d5e2;border-radius:10px;background:#f8fafc;color:#3157d5;font-weight:850}
-.writing-demo-toolbar button:disabled{cursor:wait;opacity:.62}
+.writing-demo-toolbar{display:flex;align-items:center;justify-content:flex-start;gap:12px;margin-bottom:5px;color:#52606d;font-size:.78rem;font-weight:850}
 .writing-demo-svg{display:block;width:100%;height:auto;border-radius:13px;background:linear-gradient(180deg,#fff,#fbfdff)}
 .writing-guides line{stroke:#79a7e4;stroke-width:4;opacity:.55}
 .writing-guides .middle{stroke-dasharray:18 13;opacity:.43}

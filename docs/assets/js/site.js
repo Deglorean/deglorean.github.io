@@ -134,8 +134,6 @@
     activeTimers.delete(demo);
     demo.classList.remove("is-fading");
     demo.classList.add("is-playing");
-    const button=demo.querySelector("[data-writing-replay]");
-    if(button)button.disabled=false;
     const data=timelineFor(segments);
     const startedAt=performance.now();
     applyFrame(demo,segments,data,0);
@@ -159,7 +157,6 @@
   document.querySelectorAll("[data-writing-demo]").forEach(demo=>{
     const segments=segmentsFor(demo);
     showFull(demo,segments);
-    demo.querySelector("[data-writing-replay]")?.addEventListener("click",()=>play(demo));
     if(demo.hasAttribute("data-writing-autoplay")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
       requestAnimationFrame(()=>play(demo));
     }
