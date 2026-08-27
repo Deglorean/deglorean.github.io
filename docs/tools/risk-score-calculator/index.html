@@ -88,7 +88,7 @@
   button:hover{background:#f4f7fb}
   .workspace{
     display:grid;
-    grid-template-columns:minmax(0,1120px) 500px;
+    grid-template-columns:minmax(0,1fr) minmax(380px,500px);
     gap:14px;
     align-items:start;
     justify-content:center;
@@ -101,9 +101,22 @@
     box-shadow:0 8px 24px rgba(17,24,39,.08);
   }
   .canvas-card{
-    overflow:visible;
+    overflow:hidden;
     padding:10px;
     min-width:0;
+  }
+  .canvas-viewport{
+    width:100%;
+    max-width:100%;
+    overflow:hidden;
+    border-radius:6px;
+  }
+  .canvas-swipe-hint{
+    display:none;
+    margin:8px 2px 0;
+    color:var(--muted);
+    font-size:12px;
+    text-align:center;
   }
   canvas{
     display:block;
@@ -140,7 +153,7 @@
   }
   .mode-options input{margin:0}
   .workspace.no-cost{
-    grid-template-columns:minmax(0,980px) 500px;
+    grid-template-columns:minmax(0,1fr) minmax(380px,500px);
   }
   .control-groups.single{
     grid-template-columns:1fr;
@@ -223,7 +236,8 @@
     margin-top:10px;
   }
   .method-note{
-    margin-top:12px;
+    grid-column:1;
+    margin-top:0;
     border:1px solid var(--border);
     border-radius:10px;
     padding:12px 14px;
@@ -360,19 +374,53 @@
     font-size:12px;
     line-height:1.35;
   }
-  @media(max-width:960px){
+  @media(max-width:1280px){
     .workspace{grid-template-columns:1fr; justify-content:stretch}
+    .workspace.no-cost{grid-template-columns:1fr}
     .controls-card{position:static}
+    .method-note{grid-column:1}
+  }
+  @media(max-width:900px){
+    .canvas-viewport{
+      overflow-x:auto;
+      overflow-y:hidden;
+      overscroll-behavior-inline:contain;
+      scrollbar-width:thin;
+      -webkit-overflow-scrolling:touch;
+    }
+    .canvas-viewport canvas{
+      width:900px;
+      max-width:none;
+    }
+    .canvas-swipe-hint{display:block}
+    button{min-height:44px}
+    input[type="range"]{min-height:32px}
+    .mode-options label{min-height:38px}
+  }
+  @media(max-width:700px){
     .control-groups{grid-template-columns:1fr}
     header{align-items:flex-start;flex-direction:column}
-    .toolbar{justify-content:flex-start}
+    .toolbar{width:100%;justify-content:flex-start}
+    .toolbar button{flex:1 1 calc(50% - 4px)}
+    .cost-row{grid-template-columns:1fr}
+    .small-result{min-height:64px}
   }
   @media(max-width:520px){
-    .app{margin-top:10px;padding-inline:10px}
+    .app{
+      margin-top:10px;
+      padding-left:max(10px,env(safe-area-inset-left));
+      padding-right:max(10px,env(safe-area-inset-right));
+    }
     .risk-title-lockup{align-items:flex-start}
     .might-help-home-link{flex-basis:50px;width:50px;height:48px;padding:4px;border-radius:13px}
     .might-help-home-link .might-help-code-mark{width:42px}
     h1{font-size:20px;line-height:1.08}
+    .subtitle{font-size:12px;line-height:1.3}
+    .canvas-card,.controls-card{border-radius:10px}
+    .controls-card{padding:12px}
+    .control-group,.cost-control{padding:10px}
+    .control{margin-bottom:15px}
+    .cost-slider-scale{font-size:9px}
   }
   html[data-preview="true"],html[data-preview="true"] body{min-height:100%;background:#fff;overflow:hidden}
   html[data-preview="true"] body{display:grid;place-items:center}
@@ -383,6 +431,9 @@
   html[data-preview="true"] .note{display:none!important}
   html[data-preview="true"] .workspace{display:block}
   html[data-preview="true"] .canvas-card{overflow:hidden;padding:0;border:0;border-radius:0;box-shadow:none}
+  html[data-preview="true"] .canvas-viewport{overflow:hidden}
+  html[data-preview="true"] .canvas-swipe-hint{display:none}
+  html[data-preview="true"] .canvas-viewport canvas{width:100%;max-width:100%}
   html[data-preview="true"] canvas{border:0;border-radius:0}
   @media print{
     body{background:#fff}
@@ -426,13 +477,10 @@
 
   <div class="workspace">
     <div class="canvas-card">
-      <canvas id="nomogram" width="1660" height="720" aria-label="Risk score calculator nomogram"></canvas>
-      <div class="method-note">
-        <strong>About this calculator</strong>
-        <p>This calculator uses a Fine-Kinney style risk scoring equation: <strong>risk score = probability × exposure × consequence</strong>. It was designed as a teaching tool and visual representation of the risk-analysis process, helping users see how probability, exposure, and consequence combine to create a risk score and how controls can change the result.</p>
-        <p>The cost analysis is a subjective and adaptive decision-support layer. The cost bar upper limit, cost value scale, and expected risk reduction should be adjusted by the user to suit the workplace, budget, production value, and control priorities. It should not be treated as a fixed legal, financial, or engineering standard.</p>
-        <p><strong>Licence and use:</strong> Copyright © 2026 Aaron Lederhose. Designed and programmed by Aaron Lederhose. Free to use through this website subject to the Terms of Use. The software, interface, layout, code, and explanatory content remain the copyright of Aaron Lederhose. Do not copy, redistribute, sell, re-host, or incorporate this calculator into another product without written permission.</p>
+      <div class="canvas-viewport" tabindex="0" aria-label="Scrollable risk chart">
+        <canvas id="nomogram" width="1660" height="720" aria-label="Risk score calculator nomogram"></canvas>
       </div>
+      <div class="canvas-swipe-hint" aria-hidden="true">Swipe the chart left or right to view it at a readable size.</div>
     </div>
 
     <aside class="controls-card">
@@ -546,6 +594,13 @@
         </div>
       </div>
     </aside>
+
+    <div class="method-note">
+      <strong>About this calculator</strong>
+      <p>This calculator uses a Fine-Kinney style risk scoring equation: <strong>risk score = probability × exposure × consequence</strong>. It was designed as a teaching tool and visual representation of the risk-analysis process, helping users see how probability, exposure, and consequence combine to create a risk score and how controls can change the result.</p>
+      <p>The cost analysis is a subjective and adaptive decision-support layer. The cost bar upper limit, cost value scale, and expected risk reduction should be adjusted by the user to suit the workplace, budget, production value, and control priorities. It should not be treated as a fixed legal, financial, or engineering standard.</p>
+      <p><strong>Licence and use:</strong> Copyright © 2026 Aaron Lederhose. Designed and programmed by Aaron Lederhose. Free to use through this website subject to the Terms of Use. The software, interface, layout, code, and explanatory content remain the copyright of Aaron Lederhose. Do not copy, redistribute, sell, re-host, or incorporate this calculator into another product without written permission.</p>
+    </div>
   </div>
 </div>
 
