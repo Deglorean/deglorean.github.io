@@ -20,3 +20,21 @@
 /* Open-book underline beneath the homepage title */
 .hero h1{margin-bottom:0}.hero-book-mark{width:clamp(250px,42vw,470px);max-width:100%;margin:2px auto 18px;line-height:0}.hero-book-svg{display:block;width:100%;height:auto}
 @media(max-width:620px){.hero-book-mark{width:min(285px,88vw);margin-top:4px;margin-bottom:15px}}
+
+/* Restrained Might Help teal accents; blue remains the primary action colour. */
+:root{--brand-teal:#0b7e80;--brand-teal-dark:#075f62;--brand-teal-soft:#e4f5f4;--brand-focus:#0ea6a8}
+.kicker{color:var(--brand-teal-dark)}
+.tick{background:var(--brand-teal-soft);color:var(--brand-teal-dark)}
+.filter.active{background:var(--brand-teal);border-color:var(--brand-teal);color:#fff}
+.eyebrow{border-color:#b8dfdd;background:#f7fcfc;color:var(--brand-teal-dark)}
+.dot{background:var(--brand-teal)}
+.icon{background:var(--brand-teal-soft);color:var(--brand-teal-dark);font-size:1.55rem;line-height:1}
+.open{color:var(--brand-teal-dark)}
+.tag{display:inline-flex;align-items:center;gap:6px}
+.tag:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--brand-teal);flex:0 0 auto}
+:where(a,button,input,textarea,select):focus-visible{outline:3px solid var(--brand-focus);outline-offset:3px}
+a.card{cursor:pointer}
+a.card:hover{border-color:#8bc9c7;box-shadow:0 12px 28px rgba(7,95,98,.12)}
+a.card:hover .icon{background:#d4efed}
+a.card:focus-visible{border-color:var(--brand-teal);box-shadow:0 12px 28px rgba(7,95,98,.14);transform:translateY(-2px)}
+a.card:focus-visible .open{text-decoration:underline;text-underline-offset:3px}
