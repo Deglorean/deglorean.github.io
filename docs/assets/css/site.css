@@ -38,3 +38,6 @@ a.card:hover{border-color:#8bc9c7;box-shadow:0 12px 28px rgba(7,95,98,.12)}
 a.card:hover .icon{background:#d4efed}
 a.card:focus-visible{border-color:var(--brand-teal);box-shadow:0 12px 28px rgba(7,95,98,.14);transform:translateY(-2px)}
 a.card:focus-visible .open{text-decoration:underline;text-underline-offset:3px}
+
+/* Featured handwriting animation backdrop */
+.visual{background:linear-gradient(145deg,var(--brand-teal) 0%,#1687a6 45%,var(--brand) 100%)}
