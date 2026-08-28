@@ -13016,9 +13016,48 @@ OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
     };
   }
 
+  function glyphStrokesFromObject(object, field = 'd') {
+    const stored = object?.strokeData?.[field];
+    if (Array.isArray(stored) && stored.length) {
+      const strokes = stored.map((stroke) => {
+        if (!Array.isArray(stroke?.start) || stroke.start.length < 2) return [];
+        const points = [stroke.start, ...(Array.isArray(stroke.points) ? stroke.points : [])];
+        return points
+          .filter(point => Array.isArray(point)
+            && point.length >= 2
+            && Number.isFinite(Number(point[0]))
+            && Number.isFinite(Number(point[1])))
+          .map(point => ({ x: Number(point[0]), y: Number(point[1]) }));
+      }).filter(stroke => stroke.length);
+      if (strokes.length) return strokes;
+    }
+
+    const tokens = String(object?.[field] || '').match(/[ML]|-?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?/gi) || [];
+    const strokes = [];
+    let current = null;
+    let index = 0;
+    while (index < tokens.length) {
+      const command = tokens[index++].toUpperCase();
+      if (command !== 'M' && command !== 'L') break;
+      const x = Number(tokens[index++]);
+      const y = Number(tokens[index++]);
+      if (!Number.isFinite(x) || !Number.isFinite(y)) break;
+      if (command === 'M') {
+        current = [];
+        strokes.push(current);
+      }
+      if (!current) {
+        current = [];
+        strokes.push(current);
+      }
+      current.push({ x, y });
+    }
+    return strokes.filter(stroke => stroke.length);
+  }
+
   function glyphPointByAddress(glyph, pathField, address) {
     if (!glyph || !address) return null;
-    const strokes = editorStrokesFromObject(glyph, pathField || 'd');
+    const strokes = glyphStrokesFromObject(glyph, pathField || 'd');
     const strokeIndex = Math.max(0, Number(address.stroke) - 1);
     const pointIndex = Math.max(0, Number(address.point) - 1);
     const point = strokes[strokeIndex]?.[pointIndex];
