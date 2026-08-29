@@ -179,6 +179,7 @@ to{transform:translateX(0);opacity:1}
 .resource-roadmap h2{margin:0;font-size:clamp(1.9rem,4vw,3rem);letter-spacing:-.04em}
 .roadmap-intro{max-width:720px;color:var(--muted)}
 .roadmap-columns{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+.roadmap-columns.roadmap-single{grid-template-columns:1fr;max-width:760px}
 .roadmap-columns article{padding:20px;border:1px solid var(--line);border-radius:18px;background:#f8fafc}
 .roadmap-columns h3{display:flex;align-items:center;gap:9px;margin:0 0 12px}
 .roadmap-columns ul{display:grid;gap:10px;margin:0;padding-left:21px;color:#475467}
