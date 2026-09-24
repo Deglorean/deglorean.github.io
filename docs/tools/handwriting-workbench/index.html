@@ -5792,7 +5792,7 @@
             <div class="join-character-grid" id="joinToCharacterGrid"></div>
           </fieldset>
         </div>
-        <div class="hint" style="margin-top:9px;">A join is shown only when both its starting and receiving character are selected and the handwriting style supports that pair. Adjust any preset to make a custom focus set.</div>
+        <div class="hint" style="margin-top:9px;">A join is shown only when both its starting and receiving character are selected and the handwriting style supports that pair. Contextual forms that depend on a join before or after the character return to the base form when that join is not selected. Adjust any preset to make a custom focus set.</div>
       </div>
 
       <label class="check-row" style="margin-top:10px;"><input id="differentJoinStyle" type="checkbox"> Use a different style for join lines</label>
@@ -12449,10 +12449,13 @@ OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
   function customContextualGlyphResolution(font, character, previous = '', next = '', characters = null, index = -1) {
     const reusable = reusableContextualGlyph(font, character, characters, index);
     if (reusable?.glyph) {
+      const patternLength = Array.from(reusable.combination || '').length;
       return {
         glyph: reusable.glyph,
         formId: reusable.id,
-        formType: 'contextSet'
+        formType: 'contextSet',
+        requiresIncomingJoin: reusable.position > 1,
+        requiresOutgoingJoin: reusable.position < patternLength
       };
     }
 
@@ -12465,14 +12468,37 @@ OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
     ];
     for (const key of keys) {
       if (variants[key]) {
+        const [, keyPrevious = '_', keyNext = '_'] = key.split('|');
         return {
           glyph: variants[key],
           formId: `legacy:${key}`,
-          formType: 'context'
+          formType: 'context',
+          requiresIncomingJoin: keyPrevious !== '_',
+          requiresOutgoingJoin: keyNext !== '_'
         };
       }
     }
     return null;
+  }
+
+  function contextualResolutionForJoinFocus(resolution, characters, index, settings = null) {
+    if (!resolution || !settings?.limitJoinsByCharacter) return resolution;
+    const previous = characters[index - 1] || '';
+    const current = characters[index] || '';
+    const next = characters[index + 1] || '';
+    if (
+      resolution.requiresIncomingJoin
+      && !joinAllowedForCharacters(previous, current, settings)
+    ) {
+      return null;
+    }
+    if (
+      resolution.requiresOutgoingJoin
+      && !joinAllowedForCharacters(current, next, settings)
+    ) {
+      return null;
+    }
+    return resolution;
   }
 
   function customContextualGlyph(font, character, previous = '', next = '', characters = null, index = -1) {
@@ -13159,7 +13185,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
     return font?.glyphs?.['?'] || FONT_DATA?.plain?.glyphs?.['?'] || null;
   }
 
-  function shapeText(text, fontStyle, font) {
+  function shapeText(text, fontStyle, font, settings = null) {
     const characters = Array.from(text);
 
     if (fontStyle === 'nsw_act_cursive') {
@@ -13171,15 +13197,24 @@ OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
           && isLowercaseLetter(previous)
           && previousGlyph
           && previousGlyph.joinOut
-          && !(previous === 'f' && character === 'e');
+          && !(previous === 'f' && character === 'e')
+          && (
+            !settings?.limitJoinsByCharacter
+            || joinAllowedForCharacters(previous, character, settings)
+          );
         const hasFollowingLowercase = isLowercaseLetter(characters[index + 1] || '');
-        const contextual = customContextualGlyphResolution(
-          font,
-          character,
-          previous,
-          characters[index + 1] || '',
+        const contextual = contextualResolutionForJoinFocus(
+          customContextualGlyphResolution(
+            font,
+            character,
+            previous,
+            characters[index + 1] || '',
+            characters,
+            index
+          ),
           characters,
-          index
+          index,
+          settings
         );
         const customContext = contextual?.glyph || null;
         let glyph = customContext || baseGlyph;
@@ -13206,13 +13241,18 @@ OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
       return characters.map((character, index) => {
         const previous = characters[index - 1] || '';
         const next = characters[index + 1] || '';
-        const contextual = customContextualGlyphResolution(
-          font,
-          character,
-          previous,
-          next,
+        const contextual = contextualResolutionForJoinFocus(
+          customContextualGlyphResolution(
+            font,
+            character,
+            previous,
+            next,
+            characters,
+            index
+          ),
           characters,
-          index
+          index,
+          settings
         );
         return {
           character,
@@ -13227,13 +13267,18 @@ OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
     return characters.map((character, index) => {
       const previous = characters[index - 1] || '';
       const next = characters[index + 1] || '';
-      const contextual = customContextualGlyphResolution(
-        font,
-        character,
-        previous,
-        next,
+      const contextual = contextualResolutionForJoinFocus(
+        customContextualGlyphResolution(
+          font,
+          character,
+          previous,
+          next,
+          characters,
+          index
+        ),
         characters,
-        index
+        index,
+        settings
       );
       const customContext = contextual?.glyph || null;
       const baseGlyph = worksheetGlyphForCharacter(font, character);
@@ -13263,7 +13308,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
           joinToCharacters: defaults.joinToCharacters
         };
     const characters = Array.from(text);
-    const shapedText = shapeText(text, fontStyle, font);
+    const shapedText = shapeText(text, fontStyle, font, settings);
     if (!shapedText.length) return 0;
     let origin = 0;
     for (let index = 0; index < shapedText.length - 1; index += 1) {
@@ -13287,7 +13332,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
       : firstAvailableFontKey(currentOutputMode());
     const font = FONT_DATA[fontStyle];
     const metrics = WRITING_METRICS[fontStyle];
-    const shapedText = shapeText(value, fontStyle, font);
+    const shapedText = shapeText(value, fontStyle, font, settings);
     const firstVisible = shapedText.find(item => String(item?.character || '').trim() && item?.glyph?.d);
     if (!firstVisible) return 0;
 
@@ -13967,7 +14012,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.</pre>
     const characterStrokes = [];
     const characterBoxes = [];
     const junctionPoints = [];
-    const shapedText = shapeText(text, fontStyle, font);
+    const shapedText = shapeText(text, fontStyle, font, settings);
     const firstCharacterOverhang = lineStartOverhangPixels(text, settings);
     let cursor = 6 + firstCharacterOverhang;
 
